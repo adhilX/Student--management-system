@@ -1,0 +1,1 @@
+{"root":["./src/app.ts","./src/controllers/studentscontroller.ts","./src/models/student.model.ts","./src/routers/studentroutes.ts","./src/services/studentservices.ts"],"version":"5.8.2"}
