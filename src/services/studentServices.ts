@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Student , IStudent } from '../models/student.Model.js';
 
 class StudentService{
-    private externalApiUrl = 'https://localhost:5000/api/students';
+    private externalApiUrl = 'http://localhost:5000/api/students';
 
 
 // fetch students from external API

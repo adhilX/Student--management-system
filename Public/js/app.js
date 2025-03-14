@@ -17,16 +17,44 @@ form.addEventListener('submit',async(e)=>{
         course : document.getElementById('course').value,
     }
     console.log(studentData)
+   let response;
 
-    if(!editingStudentId){
-     await fetch(`/students`,{
-        method:'POST',
-        headers :{'Content-Type' : 'application/json'},
-        body: JSON.stringify(studentData)
-     })
+    if(editingStudentId){
+         response = await fetch( `/students/${editingStudentId}`,{
+            method: 'PUT',
+            headers :{'Content-Type' : 'application/json'},
+            body : JSON.stringify(studentData)
+        })
+
+        if (response.ok) {
+            alert("Student updated successfully!");
+            editingStudentId = null;
+            submitButton.textContent = 'Add Student';
+            
+        } else {
+            alert("Failed to save student. Please try again.");
+            return
+        }
+        
+        console.log(response)
+    
+    }else{
+        console.log('uyhgjjjjjjjjjj')
+        
+         response = await fetch(`/students`,{
+            method:'POST',
+            headers :{'Content-Type' : 'application/json'},
+            body: JSON.stringify(studentData)
+         })
+         if (!response.ok) {
+            alert("Failed to save student. Please try again.");
+            return
+        }
+        
     }
+
     form.reset();
-    fetchStudent()
+  await fetchStudent();
 })
 
 async function  fetchStudent() {
@@ -34,10 +62,10 @@ async function  fetchStudent() {
     if(!response.ok) throw new Error('Failed to fetch students')
     const students = await response.json()
 
-    displayStudens(students)
+    displayStudents(students)
 }
 
-function displayStudens(students){
+function displayStudents(students){
     studentList.innerHTML = ""
 
     students.forEach((student) => {
@@ -56,8 +84,8 @@ function displayStudens(students){
     });
 }
 async function deleteStudent(id){
-    const conformDelete = confirm('Do You want to delete this student')
-    if(!conformDelete)return
+    const confirmDelete = confirm('Do you want to delete this student?');
+    if(!confirmDelete)return
     try {
         const response = await fetch(`/students/${id}`,{
             method : 'DELETE'
@@ -67,8 +95,9 @@ async function deleteStudent(id){
             fetchStudent()
         }
     } catch (error) {
-        
+        console.error("Error deleting student:", error);
     }
+    
 }
 
 function editStudent(id , name , age , email , course){

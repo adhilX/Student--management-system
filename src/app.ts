@@ -1,10 +1,10 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import studentRoutes from './routes/studentRoutes.js';
 import path from 'path';
 import { fileURLToPath } from "url";
+import { ConnectMongo } from './config/db.js';
 
 
 dotenv.config();
@@ -33,11 +33,14 @@ app.get('/', (req, res) => {
 app.use('/students', studentRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI as string)
+const connectMongo = new ConnectMongo();
+
+connectMongo.connectDB()
   .then(() => {
-    console.log("Connected to MongoDB");
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(` Server running on http://localhost:${PORT}`);
     });
   })
-  .catch(err => console.error("MongoDB Connection Error:", err));
+  .catch((error) => {
+    console.error(" Server startup failed:", error);
+  });
