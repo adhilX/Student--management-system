@@ -27,12 +27,22 @@ form.addEventListener('submit',async(e)=>{
         })
 
         if (response.ok) {
-            alert("Student updated successfully!");
+            Swal.fire({
+                icon: "success",
+                title: "Success!",
+                text: "Student updated successfully!"
+            });
+            
             editingStudentId = null;
             submitButton.textContent = 'Add Student';
             
         } else {
-            alert("Failed to save student. Please try again.");
+         Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to save student. Please try again."
+            });
+        
             return
         }
         
@@ -46,13 +56,22 @@ form.addEventListener('submit',async(e)=>{
             headers :{'Content-Type' : 'application/json'},
             body: JSON.stringify(studentData)
          })
-         if (!response.ok) {
-            alert("Failed to save student. Please try again.");
-            return
-        }
+         const responseDATA = await response.json()
+         if (response.ok) {
+          await Swal.fire({
+                icon: "success",
+                title: "Success!",
+                text: "Student add successfully!"
+            });
+        }else{
+            await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: responseDATA.error || "Failed to add student. Please try again."
+            });
         
+        }
     }
-
     form.reset();
   await fetchStudent();
 })
@@ -76,28 +95,47 @@ function displayStudents(students){
             <td>${student.email}</td>
             <td>${student.course}</td>
             <td>
-                <button onclick="editStudent('${student._id}', '${student.name}', '${student.age}', '${student.email}', '${student.course}')">✏️ Edit</button>
-                <button onclick="deleteStudent('${student._id}')">❌ Delete</button>
+                <button class="edit-btn" onclick="editStudent('${student._id}', '${student.name}', '${student.age}', '${student.email}', '${student.course}')">✏️ Edit</button>
+                <button class="delete-btn" onclick="deleteStudent('${student._id}')">❌ Delete</button>
             </td>
         `;
         studentList.appendChild(row);
     });
 }
-async function deleteStudent(id){
-    const confirmDelete = confirm('Do you want to delete this student?');
-    if(!confirmDelete)return
+async function deleteStudent(id) {
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
     try {
-        const response = await fetch(`/students/${id}`,{
-            method : 'DELETE'
-        })
-        if(response.ok){
-            alert('student deleted succssfully')
-            fetchStudent()
-        }
+        const response = await fetch(`/students/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: "Student deleted successfully.",
+            });
+            fetchStudent(); 
+        } 
+        
     } catch (error) {
         console.error("Error deleting student:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong. Please try again.",
+        });
     }
-    
 }
 
 function editStudent(id , name , age , email , course){
@@ -110,3 +148,4 @@ function editStudent(id , name , age , email , course){
 }
 
 fetchStudent()
+

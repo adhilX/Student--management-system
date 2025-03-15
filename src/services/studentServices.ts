@@ -1,25 +1,22 @@
-import axios from 'axios';
-import { Student , IStudent } from '../models/student.Model.js';
+import { Student , IStudent} from '../models/student.Model.js';
 
-class StudentService{
-    private externalApiUrl = 'http://localhost:5000/api/students';
-
-
-// fetch students from external API
-async fetchExternalStudents(): Promise<IStudent[]>{
-    try {
-        const response = await axios.get(this.externalApiUrl);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching external students', error);
-        throw new Error('Error fetching external students');
-    }
-}
-// fetch students from database
-async getAllStudents(): Promise<IStudent[]>{
+// Fetch all students
+export const getAllStudents = async () => {
     return await Student.find();
-}
-}
+};
 
-export const studentService = new StudentService();
+// Create a new student
+export const createNewStudent = async (name: string, age: number, email: string, course: string):Promise<IStudent> => {
+    const newStudent = new Student({ name, age, email, course });
+    return await newStudent.save();
+};
 
+// Delete a student by ID
+export const deleteStudentById = async (id: string) => {
+    return await Student.findByIdAndDelete(id);
+};
+
+// Update student details
+export const updateStudentById = async (id: string, updatedData: any) => {
+    return await Student.findByIdAndUpdate(id, updatedData, { new: true });
+};
